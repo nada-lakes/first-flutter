@@ -19,6 +19,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Contact> contacts = [];
   List<Contact> filteredContacts = [];
   bool _showOnlyFavorites = false;
+  bool _isAsc = true;
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -44,9 +45,14 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _shortContactsAsc() {
+  void _toggleSort() {
     setState(() {
-      contacts.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      if (_isAsc) {
+        contacts.sort((a, b) => b.name.toLowerCase().compareTo(a.name.toLowerCase()));
+      } else {
+        contacts.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      }
+      _isAsc = !_isAsc;
     });
   }
 
@@ -117,8 +123,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 const SizedBox(width: 8),
                 IconButton(
                   icon: const Icon(Icons.sort_by_alpha),
-                  tooltip: 'Sort A-Z',
-                  onPressed: _shortContactsAsc, 
+                  tooltip: 'Sort Data',
+                  onPressed: _toggleSort, 
                 ),
                 IconButton(
                   icon: Icon(_showOnlyFavorites ? Icons.favorite : Icons.favorite_border),
