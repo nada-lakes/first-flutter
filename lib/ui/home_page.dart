@@ -193,7 +193,12 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: SpeedDial(
         icon: Icons.add,
         activeIcon: Icons.close,
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.white
+          : Colors.blue,
+        foregroundColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.blue
+          : Colors.white,
         children: [
           SpeedDialChild(
             child: const Icon(Icons.person_add),
