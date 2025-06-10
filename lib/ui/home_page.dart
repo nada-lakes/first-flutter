@@ -141,7 +141,14 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
 
           Expanded(
-            child: ListView.separated(
+            child: filteredContacts.isEmpty
+              ? const Center(
+                  child: Text(
+                    'Empty Data',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                )
+              : ListView.separated(
               itemCount: filteredContacts.length,
               itemBuilder: (context, index) {
                 final contact = filteredContacts[index];
@@ -222,7 +229,12 @@ class _MyHomePageState extends State<MyHomePage> {
             child: const Icon(Icons.file_download),
             label: 'Export Contact',
             onTap: () {
-              // your action
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Kontak di eksport'),
+                  duration: Duration(seconds: 3),
+                )
+              );
             },
           ),
         ],
