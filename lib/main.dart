@@ -1,4 +1,5 @@
 import 'package:first_flutter/repositories/contact_repository.dart';
+import 'package:first_flutter/ui/qr_scan_page.dart';
 import 'package:first_flutter/ui/setting_page.dart';
 import 'package:first_flutter/ui/theme_notifier.dart';
 import 'package:flutter/material.dart';
@@ -97,7 +98,7 @@ class MainPage extends StatelessWidget {
           ),
           onPressed: () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const Center(child: Text('QR page placeholder'))),
+              MaterialPageRoute(builder: (_) => const QRScanPage()),
             );
           },
           tooltip: 'QR Code',
