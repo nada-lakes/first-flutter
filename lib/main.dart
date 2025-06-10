@@ -9,7 +9,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   await Hive.openBox('contactsBox');
-  await Hive.openBox('settingsBox'); // <-- tambahkan ini
+  await Hive.openBox('settingsBox');
   await ContactRepository.init();
   runApp(MyApp());
 }
@@ -57,24 +57,29 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         body: TabBarView(
           children: [
             const MyHomePage(title: 'My Contacts'),
-            const Center(child: Text('Favorites page placeholder')),
+            const Center(child: Text('Message page placeholder')),
+            const Center(child: Text('Images page placeholder')),
             MySettingPage(
               title: 'Settings',
-              themeNotifier: themeNotifier, // <-- kirim ke Settings
+              themeNotifier: themeNotifier,
             ),
           ],
         ),
-        bottomNavigationBar: Container(
+
+        bottomNavigationBar: BottomAppBar(
+          shape: const CircularNotchedRectangle(),
+          notchMargin: 8,
           color: Theme.of(context).primaryColor,
           child: const TabBar(
             tabs: [
               Tab(icon: Icon(Icons.home), text: 'Home'),
-              Tab(icon: Icon(Icons.image), text: 'Images'),
+              Tab(icon: Icon(Icons.message), text: 'Blank'),
+              Tab(icon: Icon(Icons.image), text: 'Image'),
               Tab(icon: Icon(Icons.settings), text: 'Settings'),
             ],
             labelColor: Colors.white,
@@ -82,6 +87,21 @@ class MainPage extends StatelessWidget {
             indicatorSize: TabBarIndicatorSize.label,
             indicatorColor: Colors.white,
           ),
+        ),
+
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.blue, // jadi biru
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30), // buat lebih rounded
+          ),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const Center(child: Text('QR page placeholder'))),
+            );
+          },
+          tooltip: 'QR Code',
+          child: const Icon(Icons.qr_code, color: Colors.white),
         ),
       ),
     );
