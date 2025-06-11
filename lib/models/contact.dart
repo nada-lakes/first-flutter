@@ -17,7 +17,7 @@ class Contact {
     'id': id,
     'name': name,
     'phone_number': phoneNumber,
-    'is_favorite': isFavorite,
+    'isFavorite': isFavorite,
     'photo': photo,
   };
 
@@ -25,7 +25,7 @@ class Contact {
     id: json['id'],
     name: json['name'],
     phoneNumber: json['phone_number'],
-    isFavorite: json['is_favorite'],
+    isFavorite: json['isFavorite'],
     photo: json['photo'],
   );
 
