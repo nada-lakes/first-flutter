@@ -138,8 +138,10 @@ class _ContactFormState extends State<ContactForm> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Phone number is required';
-                  } else if (!RegExp(r'^\+?\d+$').hasMatch(value)) {
-                    return 'Only digits allowed (may start with +)';
+                  }
+                  final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
+                  if (!digitsOnly.startsWith('628')) {
+                    return 'Phone number must start with 628';
                   }
                   return null;
                 },

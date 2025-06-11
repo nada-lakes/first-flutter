@@ -43,6 +43,7 @@ dependencies:
   path: ^1.8.3
   qr_code_scanner_plus: ^2.0.10+1
   excel: ^2.1.0
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:

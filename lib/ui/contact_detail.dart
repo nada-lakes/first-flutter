@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:first_flutter/ui/generate_qr_page.dart';
 import 'package:flutter/material.dart';
 import '../../models/contact.dart';
 import '../ui/contact_form.dart';
@@ -42,6 +43,20 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       });
 
     }
+  }
+
+  void _generateQr() {
+    final dataJson = jsonEncode({
+      'name': _contact.name,
+      'phone': _contact.phoneNumber.toString(),
+    });
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => QRGeneratorPage(dataToEncode: dataJson),
+      ),
+    );
   }
 
   @override
@@ -99,12 +114,32 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                Center(
-                  child: ElevatedButton.icon(
-                    onPressed: _editContact,
-                    icon: const Icon(Icons.edit),
-                    label: const Text('Edit Contact'),
-                  ),
+                Row(
+                  children: [
+                    Center(
+                      child: ElevatedButton.icon(
+                        onPressed: _generateQr,
+                        icon: const Icon(Icons.qr_code),
+                        label: const Text("Generate QR Code"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Center(
+                      child: ElevatedButton.icon(
+                        onPressed: _editContact,
+                        icon: const Icon(Icons.edit),
+                        label: const Text('Edit Contact'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.yellow,
+                          foregroundColor: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
