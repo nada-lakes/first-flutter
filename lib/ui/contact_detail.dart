@@ -32,7 +32,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
 
     // fetch ulang data agar terupdate
     if (updated == true) {
-      await ContactRepository.refresh();
+      await ContactRepository.getData();
 
       final latest = ContactRepository.contacts
           .firstWhere((c) => c.id == _contact.id, orElse: () => _contact);
@@ -60,7 +60,6 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
         child: Icon(Icons.person, size: 50),
       );
     }
-
 
     return Scaffold(
       appBar: AppBar(

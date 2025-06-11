@@ -92,9 +92,9 @@ class MainPage extends StatelessWidget {
 
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.blue, // jadi biru
+          backgroundColor: Colors.blue,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30), // buat lebih rounded
+            borderRadius: BorderRadius.circular(30),
           ),
           onPressed: () {
             Navigator.of(context).push(

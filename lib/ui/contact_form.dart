@@ -26,13 +26,16 @@ class _ContactFormState extends State<ContactForm> {
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
     if (pickedFile != null) {
       final imageBytes = await pickedFile.readAsBytes();
-      _pickedXFile = pickedFile;
-      _selectedImage = imageBytes;
-      _base64Image = base64Encode(imageBytes);
-      if(mounted) setState(() {}); // trigger render
+
+      if (!mounted) return;
+
+      setState(() {
+        _pickedXFile = pickedFile;
+        _selectedImage = imageBytes;
+        _base64Image = base64Encode(imageBytes);
+      });
     }
   }
 
@@ -40,15 +43,15 @@ class _ContactFormState extends State<ContactForm> {
   void initState() {
     super.initState();
     Contact? contact = widget.contact;
-      if (contact != null) {
-        _nameController.text = contact.name;
-        _phoneController.text = contact.phoneNumber;
-        if (contact.photo != null) {
-          final decodedBytes = base64Decode(contact.photo.toString());
-          _selectedImage = decodedBytes;
-          _base64Image = widget.contact?.photo;
-        }
+    if (contact != null) {
+      _nameController.text = contact.name;
+      _phoneController.text = contact.phoneNumber;
+      if (contact.photo != null) {
+        final decodedBytes = base64Decode(contact.photo.toString());
+        _selectedImage = decodedBytes;
+        _base64Image = widget.contact?.photo;
       }
+    }
   }
 
   @override

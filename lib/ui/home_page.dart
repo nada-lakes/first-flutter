@@ -18,8 +18,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<Contact> contacts = [];
   List<Contact> filteredContacts = [];
-  bool _showOnlyFavorites = false;
-  bool _isAsc = true;
+  static bool _showOnlyFavorites = false;
+  static bool _isAsc = true;
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -30,6 +30,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _loadContacts() async {
+    if (!mounted) return;
+
     setState(() {
       contacts = ContactRepository.contacts;
       filteredContacts = contacts;
@@ -40,25 +42,29 @@ class _MyHomePageState extends State<MyHomePage> {
     final query = _searchController.text.toLowerCase();
     setState(() {
       filteredContacts = contacts.where((contact) { 
-      return contact.name.toLowerCase().contains(query) || contact.phoneNumber.contains(query);
+        return contact.name.toLowerCase().contains(query) || contact.phoneNumber.contains(query);
       }).toList();
     });
   }
 
   void _toggleSort() {
+    final sortedData = [...contacts];
+    sortedData.sort((a, b) {
+      final nameA = a.name.toLowerCase();
+      final nameB = b.name.toLowerCase();
+      return _isAsc ? nameA.compareTo(nameB) : nameB.compareTo(nameA);
+    });
+
     setState(() {
-      if (_isAsc) {
-        contacts.sort((a, b) => b.name.toLowerCase().compareTo(a.name.toLowerCase()));
-      } else {
-        contacts.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-      }
+      filteredContacts = sortedData;
       _isAsc = !_isAsc;
     });
   }
 
   void _showFavoriteContacts() {
-    _showOnlyFavorites = !_showOnlyFavorites;
     final query = _searchController.text.toLowerCase();
+    _showOnlyFavorites = !_showOnlyFavorites;
+
     setState(() {
       filteredContacts = contacts.where((contact) {
         final matchesFavorite = !_showOnlyFavorites || contact.isFavorite;
@@ -70,13 +76,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onDelete(int id) async {
     await ContactRepository.deleteContact(id);
-    _loadContacts(); // reload data
+    _loadContacts();
   }
 
   void _updateFavoriteContact(int id, bool isFavorite) async {
     final newStatus = !isFavorite;
     await ContactRepository.updateFavoriteContact(id,newStatus);
-    _loadContacts(); // reload data
+    _loadContacts();
   }
 
   void navigateToAddContactPage(BuildContext context) {
