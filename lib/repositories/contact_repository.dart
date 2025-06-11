@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/contact.dart';
 
@@ -51,17 +50,6 @@ class ContactRepository {
 
   static Future<void> deleteContact(int id) async {
     final contact = _contacts.firstWhere((c) => c.id == id);
-    
-      if (contact.photoPath != null && contact.photoPath!.isNotEmpty) {
-        final file = File(contact.photoPath!);
-        if (await file.exists()) {
-          try {
-            await file.delete();
-          } catch (e) {
-            print("Failed to delete photo file: $e");
-          }
-        }
-      }
 
       _contacts.removeWhere((c) => c.id == id);
       await _saveContacts();

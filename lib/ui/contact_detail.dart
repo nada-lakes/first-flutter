@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../models/contact.dart';
 import '../ui/contact_form.dart';
@@ -49,11 +48,11 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   Widget build(BuildContext context) {
     Widget imageWidget;
 
-    if (_contact.photoPath != null && _contact.photoPath!.isNotEmpty) {
-      final file = File(_contact.photoPath!);
+    if (_contact.photo != null && _contact.photo!.isNotEmpty) {
+      final image = base64Decode(_contact.photo!);
       imageWidget = CircleAvatar(
         radius: 60,
-        backgroundImage: FileImage(file),
+        backgroundImage: MemoryImage(image),
       );
     } else {
       imageWidget = const CircleAvatar(

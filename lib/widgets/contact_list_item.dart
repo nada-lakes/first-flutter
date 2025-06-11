@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models/contact.dart';
 
@@ -20,9 +19,10 @@ class ContactListItem extends StatelessWidget {
 
     Widget avatar;
 
-    if(contact.photoPath != null && contact.photoPath!.isNotEmpty) {
+    if(contact.photo != null && contact.photo!.isNotEmpty) {
+      final image = base64Decode(contact.photo!);
       avatar = CircleAvatar(
-        backgroundImage: FileImage(File(contact.photoPath!)),
+        backgroundImage: MemoryImage(image),
         radius: 24,
       );
     } else {

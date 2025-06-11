@@ -3,14 +3,14 @@ class Contact {
   String name;
   String phoneNumber;
   bool isFavorite;
-  String? photoPath;
+  String? photo;
 
   Contact({
     required this.id,
     required this.name,
     required this.phoneNumber,
     required this.isFavorite,
-    this.photoPath
+    this.photo
   });
 
   Map<String, dynamic> toJson() => {
@@ -18,7 +18,7 @@ class Contact {
     'name': name,
     'phone_number': phoneNumber,
     'is_favorite': isFavorite,
-    'photo_path': photoPath,
+    'photo': photo,
   };
 
   factory Contact.fromJson(Map<String, dynamic> json) => Contact(
@@ -26,7 +26,7 @@ class Contact {
     name: json['name'],
     phoneNumber: json['phone_number'],
     isFavorite: json['is_favorite'],
-    photoPath: json['photo_path'],
+    photo: json['photo'],
   );
 
 }

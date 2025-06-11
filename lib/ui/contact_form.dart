@@ -1,10 +1,10 @@
-import 'dart:io';
-
 import 'package:first_flutter/models/contact.dart';
 import 'package:first_flutter/repositories/contact_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
 
 class ContactForm extends StatefulWidget {
   final Contact? contact;
@@ -19,29 +19,36 @@ class _ContactFormState extends State<ContactForm> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
 
-  File? _selectedImage;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.contact != null) {
-      _nameController.text = widget.contact!.name;
-      _phoneController.text = widget.contact!.phoneNumber;
-      if (widget.contact!.photoPath != null) {
-        _selectedImage = File(widget.contact!.photoPath!);
-      }
-    }
-  }
+  Uint8List? _selectedImage;
+  XFile? _pickedXFile;
+  String? _base64Image;
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
+      final imageBytes = await pickedFile.readAsBytes();
+      _pickedXFile = pickedFile;
+      _selectedImage = imageBytes;
+      _base64Image = base64Encode(imageBytes);
+      if(mounted) setState(() {}); // trigger render
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Contact? contact = widget.contact;
+      if (contact != null) {
+        _nameController.text = contact.name;
+        _phoneController.text = contact.phoneNumber;
+        if (contact.photo != null) {
+          final decodedBytes = base64Decode(contact.photo.toString());
+          _selectedImage = decodedBytes;
+          _base64Image = widget.contact?.photo;
+        }
+      }
   }
 
   @override
@@ -63,7 +70,7 @@ class _ContactFormState extends State<ContactForm> {
                       radius: 50,
                       backgroundColor: Colors.grey[300],
                       backgroundImage:
-                          _selectedImage != null ? FileImage(_selectedImage!) : null,
+                          _selectedImage != null ? MemoryImage(_selectedImage!) : null,
                       child: _selectedImage == null
                           ? const Icon(Icons.person, size: 50, color: Colors.white)
                           : null,
@@ -114,6 +121,7 @@ class _ContactFormState extends State<ContactForm> {
               const SizedBox(height: 16),
 
               TextFormField(
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 controller: _phoneController,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
@@ -146,6 +154,13 @@ class _ContactFormState extends State<ContactForm> {
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     final box = Hive.box(ContactRepository.boxName);
+
+                    String? finalPhotoPath = widget.contact?.photo;
+
+                    if (_pickedXFile != null) {
+                      finalPhotoPath = _base64Image;
+                    }
+
                     if (widget.contact == null) {
                       int latestId = box.get('latestId', defaultValue: 0);
 
@@ -154,7 +169,7 @@ class _ContactFormState extends State<ContactForm> {
                         name: _nameController.text,
                         phoneNumber: _phoneController.text,
                         isFavorite: false,
-                        photoPath: _selectedImage?.path,
+                        photo: finalPhotoPath,
                       );
 
                       await ContactRepository.addContact(contact);
@@ -165,7 +180,7 @@ class _ContactFormState extends State<ContactForm> {
                         name: _nameController.text,
                         phoneNumber: _phoneController.text,
                         isFavorite: widget.contact!.isFavorite,
-                        photoPath: _selectedImage?.path,
+                        photo: finalPhotoPath,
                       );
 
                       await ContactRepository.updateContact(updated);
