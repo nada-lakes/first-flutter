@@ -235,12 +235,16 @@ class _MyHomePageState extends State<MyHomePage> {
             child: const Icon(Icons.file_download),
             label: 'Export Contact',
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Kontak di eksport'),
-                  duration: Duration(seconds: 3),
-                )
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const Dialog(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  child: Center(child: CircularProgressIndicator()),
+                ),
               );
+              _exportData();
             },
           ),
         ],
@@ -248,6 +252,26 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Future<void> _exportData() async {
+    await Future.delayed(const Duration(seconds: 7));
+
+    if (!mounted) return;
+
+    Navigator.of(context).pop();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Berhasil"),
+        content: const Text("Kontak berhasil diekspor."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Tutup"),
+          ),
+        ],
+      ),
+    );
+  }
 
   /// `dispose()` adalah method lifecycle dari `StatefulWidget`
   /// yang digunakan untuk membersihkan resource saat widget
