@@ -1,4 +1,6 @@
 PODS:
+  - file_saver (0.0.1):
+    - Flutter
   - Flutter (1.0.0)
   - image_picker_ios (0.0.1):
     - Flutter
@@ -6,14 +8,18 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - permission_handler_apple (9.3.0):
+    - Flutter
   - qr_code_scanner_plus (0.2.6):
     - Flutter
     - MTBBarcodeScanner
 
 DEPENDENCIES:
+  - file_saver (from `.symlinks/plugins/file_saver/ios`)
   - Flutter (from `Flutter`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - qr_code_scanner_plus (from `.symlinks/plugins/qr_code_scanner_plus/ios`)
 
 SPEC REPOS:
@@ -21,20 +27,26 @@ SPEC REPOS:
     - MTBBarcodeScanner
 
 EXTERNAL SOURCES:
+  file_saver:
+    :path: ".symlinks/plugins/file_saver/ios"
   Flutter:
     :path: Flutter
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
   qr_code_scanner_plus:
     :path: ".symlinks/plugins/qr_code_scanner_plus/ios"
 
 SPEC CHECKSUMS:
+  file_saver: 6cdbcddd690cb02b0c1a0c225b37cd805c2bf8b6
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
   MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
+  permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
   qr_code_scanner_plus: 7e087021bc69873140e0754750eb87d867bed755
 
 PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796

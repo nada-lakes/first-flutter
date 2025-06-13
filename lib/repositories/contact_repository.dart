@@ -66,4 +66,8 @@ class ContactRepository {
     }
   }
 
+  static Future<List<Contact>> getAllContact() async {
+    return contacts;
+  }
+
 }

@@ -1,7 +1,11 @@
+import 'dart:io';
+import 'package:excel/excel.dart';
 import 'package:first_flutter/repositories/contact_repository.dart';
 import 'package:first_flutter/ui/contact_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../models/contact.dart';
 import '../../widgets/contact_list_item.dart';
 import 'contact_form.dart';
@@ -96,6 +100,110 @@ class _MyHomePageState extends State<MyHomePage> {
         _loadContacts();
       }
     });
+  }
+
+  Future<bool> _requestStoragePermission() async {
+    if (Platform.isAndroid) {
+      if (await Permission.manageExternalStorage.isGranted) {
+        return true;
+      } else {
+        final status = await Permission.manageExternalStorage.request();
+        return status.isGranted;
+      }
+    }
+    return true; // untuk iOS dan lainnya, anggap granted
+  }
+
+  String _twoDigits(int n) => n.toString().padLeft(2, '0');
+
+  Future<void> _exportData() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Center(child: CircularProgressIndicator()),
+      ),
+    );
+
+    try {
+      // izin penyimpanan untuk Android
+      final granted = await _requestStoragePermission();
+      if (!granted) {
+        if (!mounted) return;
+        Navigator.of(context).pop();
+        _showMessage("Akses penyimpanan ditolak. Silakan aktifkan permission di Pengaturan.");
+        return;
+      }
+
+      final contacts = await ContactRepository.getAllContact();
+
+      final excel = Excel.createExcel();
+      final sheet = excel['Contacts'];
+      
+      sheet.appendRow(['Name', 'Phone Number', 'Favorite']);
+
+      for (var contact in contacts) {
+        sheet.appendRow([
+          contact.name,
+          contact.phoneNumber,
+          contact.isFavorite ? 'Yes' : 'No',
+        ]);
+      }
+
+      final bytes = excel.encode();
+      if (bytes == null) {
+        if (!mounted) return;
+        Navigator.of(context).pop();
+        _showMessage("Gagal membuat file Excel.");
+        return;
+      }
+
+      // Tentukan path ke folder Download
+      Directory? directory;
+      if (Platform.isAndroid) {
+        directory = Directory('/storage/emulated/0/Download');
+      } else {
+        directory = await getApplicationDocumentsDirectory();
+      }
+
+      // Buat folder jika belum ada
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+      
+      // Simpan file
+      final now = DateTime.now();
+      final formattedDate = '${now.year}-${_twoDigits(now.month)}-${_twoDigits(now.day)}_${_twoDigits(now.hour)}-${_twoDigits(now.minute)}-${_twoDigits(now.second)}';
+      final filePath = '${directory.path}/contacts_export_$formattedDate.xlsx';
+      final file = File(filePath);
+      await file.writeAsBytes(bytes, flush: true);
+
+      if (!mounted) return;
+      Navigator.of(context).pop();
+
+      _showMessage("Kontak berhasil diekspor ke:\n$filePath");
+    } catch (e) {
+      Navigator.of(context).pop();
+      _showMessage("Terjadi kesalahan saat ekspor:\n${e.toString()}");
+    }
+  }
+
+  void _showMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Ekspor Kontak"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -235,38 +343,8 @@ class _MyHomePageState extends State<MyHomePage> {
             child: const Icon(Icons.file_download),
             label: 'Export Contact',
             onTap: () {
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) => const Dialog(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-              );
               _exportData();
             },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _exportData() async {
-    await Future.delayed(const Duration(seconds: 7));
-
-    if (!mounted) return;
-
-    Navigator.of(context).pop();
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Berhasil"),
-        content: const Text("Kontak berhasil diekspor."),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text("Tutup"),
           ),
         ],
       ),
