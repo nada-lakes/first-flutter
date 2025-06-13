@@ -115,12 +115,13 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                 ),
                 const SizedBox(height: 24),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Center(
                       child: ElevatedButton.icon(
                         onPressed: _generateQr,
                         icon: const Icon(Icons.qr_code),
-                        label: const Text("Generate QR Code"),
+                        label: const Text("QR Code"),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           foregroundColor: Colors.white,
