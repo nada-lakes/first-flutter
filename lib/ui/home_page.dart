@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:excel/excel.dart';
 import 'package:first_flutter/repositories/contact_repository.dart';
 import 'package:first_flutter/ui/contact_detail.dart';
+import 'package:first_flutter/ui/import_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:path_provider/path_provider.dart';
@@ -16,10 +17,10 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyHomePage> createState() => MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class MyHomePageState extends State<MyHomePage> {
   List<Contact> contacts = [];
   List<Contact> filteredContacts = [];
   static bool _showOnlyFavorites = false;
@@ -29,11 +30,11 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _loadContacts();
+    loadContacts();
     _searchController.addListener(_filterContacts);
   }
 
-  Future<void> _loadContacts() async {
+  Future<void> loadContacts() async {
     if (!mounted) return;
 
     setState(() {
@@ -80,13 +81,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onDelete(int id) async {
     await ContactRepository.deleteContact(id);
-    _loadContacts();
+    loadContacts();
   }
 
   void _updateFavoriteContact(int id, bool isFavorite) async {
     final newStatus = !isFavorite;
     await ContactRepository.updateFavoriteContact(id,newStatus);
-    _loadContacts();
+    loadContacts();
   }
 
   void navigateToAddContactPage(BuildContext context) {
@@ -97,7 +98,20 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     ).then((shouldReload) {
       if (shouldReload == true) {
-        _loadContacts();
+        loadContacts();
+      }
+    });
+  }
+
+  void navigateToImportPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ImportPage(),
+      ),
+    ).then((shouldReload) {
+      if (shouldReload == true) {
+        loadContacts();
       }
     });
   }
@@ -248,7 +262,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.refresh),
-                  onPressed: _loadContacts, 
+                  onPressed: loadContacts, 
                 ),
               ],
             ),
@@ -306,7 +320,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           builder: (context) => ContactDetailPage(contact: contact),
                         ),
                       ).then((shouldReload) {
-                          _loadContacts();
+                          loadContacts();
                       });
                     },
                   ),
@@ -335,9 +349,7 @@ class _MyHomePageState extends State<MyHomePage> {
           SpeedDialChild(
             child: const Icon(Icons.input),
             label: 'Import Contact',
-            onTap: () {
-              // your action
-            },
+            onTap: () => navigateToImportPage(context)
           ),
           SpeedDialChild(
             child: const Icon(Icons.file_download),

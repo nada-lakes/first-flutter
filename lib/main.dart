@@ -50,10 +50,21 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MainPage extends StatelessWidget {
+class MainPage extends StatefulWidget {
   final ThemeNotifier themeNotifier;
 
   const MainPage({super.key, required this.themeNotifier});
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  final GlobalKey<MyHomePageState> _homePageKey = GlobalKey();
+
+  void loadDataContact() async {
+  await _homePageKey.currentState?.loadContacts();
+}
 
   @override
   Widget build(BuildContext context) {
@@ -62,12 +73,12 @@ class MainPage extends StatelessWidget {
       child: Scaffold(
         body: TabBarView(
           children: [
-            const MyHomePage(title: 'My Contacts'),
+             MyHomePage(key: _homePageKey, title: 'My Contacts'),
             const Center(child: Text('Message page placeholder')),
             const Center(child: Text('Images page placeholder')),
             MySettingPage(
               title: 'Settings',
-              themeNotifier: themeNotifier,
+              themeNotifier: widget.themeNotifier,
             ),
           ],
         ),
@@ -97,9 +108,16 @@ class MainPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(30),
           ),
           onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const QRScanPage()),
-            );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const QRScanPage(),
+              ),
+            ).then((shouldReload) {
+              if (shouldReload == true) {
+                loadDataContact();
+              }
+            });
           },
           tooltip: 'QR Code',
           child: const Icon(Icons.qr_code, color: Colors.white),
