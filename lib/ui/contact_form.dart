@@ -54,6 +54,56 @@ class _ContactFormState extends State<ContactForm> {
     }
   }
 
+  Future<void> _saveContact() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final box = Hive.box(ContactRepository.boxName);
+    final String name = _nameController.text;
+    final String phone = _phoneController.text;
+    final String? finalPhotoPath = _pickedXFile != null ? _base64Image : widget.contact?.photo;
+
+    if (widget.contact == null) {
+      await _addNewContact(box, name, phone, finalPhotoPath);
+    } else {
+      await _updateExistingContact(name, phone, finalPhotoPath);
+    }
+  }
+
+  Future<void> _addNewContact(Box box, String name, String phone, String? photoPath) async {
+    final int latestId = box.get('latestId', defaultValue: 0);
+
+    final newContact = Contact(
+      id: latestId + 1,
+      name: name,
+      phoneNumber: phone,
+      isFavorite: false,
+      photo: photoPath,
+    );
+
+    await ContactRepository.addContact(newContact);
+    await box.put('latestId', newContact.id);
+
+    if (!mounted) return;
+    Navigator.pop(context, true);
+  }
+
+  Future<void> _updateExistingContact(String name, String phone, String? photoPath) async {
+    final updatedContact = Contact(
+      id: widget.contact!.id,
+      name: name,
+      phoneNumber: phone,
+      isFavorite: widget.contact!.isFavorite,
+      photo: photoPath,
+    );
+
+    await ContactRepository.updateContact(updatedContact);
+
+    if (!mounted) return;
+
+    Navigator.pop(context);
+    Navigator.pop(context, true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,7 +178,7 @@ class _ContactFormState extends State<ContactForm> {
                 controller: _phoneController,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  hintText: "+62",
+                  hintText: "628",
                   labelText: "Phone Number",
                   labelStyle: TextStyle(fontSize: 20),
                   icon: Icon(Icons.phone, color: Colors.green),
@@ -157,41 +207,7 @@ class _ContactFormState extends State<ContactForm> {
                   textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    final box = Hive.box(ContactRepository.boxName);
-
-                    String? finalPhotoPath = widget.contact?.photo;
-
-                    if (_pickedXFile != null) {
-                      finalPhotoPath = _base64Image;
-                    }
-
-                    if (widget.contact == null) {
-                      int latestId = box.get('latestId', defaultValue: 0);
-
-                      final contact = Contact(
-                        id: latestId + 1,
-                        name: _nameController.text,
-                        phoneNumber: _phoneController.text,
-                        isFavorite: false,
-                        photo: finalPhotoPath,
-                      );
-
-                      await ContactRepository.addContact(contact);
-                      await box.put('latestId', contact.id);
-                    } else {
-                      final updated = Contact(
-                        id: widget.contact!.id,
-                        name: _nameController.text,
-                        phoneNumber: _phoneController.text,
-                        isFavorite: widget.contact!.isFavorite,
-                        photo: finalPhotoPath,
-                      );
-
-                      await ContactRepository.updateContact(updated);
-                    }
-                    if (context.mounted) Navigator.pop(context, true);
-                  }
+                  _saveContact();
                 },
                 child: const Text('Save Contact'),
               ),

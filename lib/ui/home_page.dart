@@ -99,6 +99,7 @@ class MyHomePageState extends State<MyHomePage> {
     ).then((shouldReload) {
       if (shouldReload == true) {
         loadContacts();
+        _showMessage("Success", "Added contact succesfull.");
       }
     });
   }
@@ -112,7 +113,7 @@ class MyHomePageState extends State<MyHomePage> {
     ).then((shouldReload) {
       if (shouldReload == true) {
         loadContacts();
-        _showMessage("Contact import successfull");
+        _showMessage("Import Kontak", "Contact import successfull");
       }
     });
   }
@@ -148,7 +149,7 @@ class MyHomePageState extends State<MyHomePage> {
       if (!granted) {
         if (!mounted) return;
         Navigator.of(context).pop();
-        _showMessage("Akses penyimpanan ditolak. Silakan aktifkan permission di Pengaturan.");
+        _showMessage("Export Contact", "Storage access was denied. Please enable storage permission in your device settings.");
         return;
       }
 
@@ -171,7 +172,7 @@ class MyHomePageState extends State<MyHomePage> {
       if (bytes == null) {
         if (!mounted) return;
         Navigator.of(context).pop();
-        _showMessage("Gagal membuat file Excel.");
+        _showMessage("Export Contact", "Could not generate the Excel file.");
         return;
       }
 
@@ -198,18 +199,18 @@ class MyHomePageState extends State<MyHomePage> {
       if (!mounted) return;
       Navigator.of(context).pop();
 
-      _showMessage("Kontak berhasil diekspor ke:\n$filePath");
+      _showMessage("Export Contact", "Export contact success to:\n$filePath");
     } catch (e) {
       Navigator.of(context).pop();
-      _showMessage("Terjadi kesalahan saat ekspor:\n${e.toString()}");
+      _showMessage("Export Contact", "Something wrong:\n${e.toString()}");
     }
   }
 
-  void _showMessage(String message) {
+  void _showMessage(String title, String message) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text("Ekspor Kontak"),
+        title: Text(title),
         content: Text(message),
         actions: [
           TextButton(
@@ -321,7 +322,10 @@ class MyHomePageState extends State<MyHomePage> {
                           builder: (context) => ContactDetailPage(contact: contact),
                         ),
                       ).then((shouldReload) {
-                          loadContacts();
+                          if (shouldReload == true) {
+                            loadContacts();
+                            _showMessage("Success", "Contact updated sucessfull.");
+                          }
                       });
                     },
                   ),
