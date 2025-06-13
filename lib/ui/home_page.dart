@@ -112,6 +112,7 @@ class MyHomePageState extends State<MyHomePage> {
     ).then((shouldReload) {
       if (shouldReload == true) {
         loadContacts();
+        _showMessage("Contact import successfull");
       }
     });
   }
