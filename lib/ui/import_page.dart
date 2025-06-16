@@ -20,9 +20,8 @@ class _ImportPageState extends State<ImportPage> {
     final result = await FilePicker.platform.pickFiles();
 
     if(result != null && result.files.isNotEmpty) {
-      setState(() {
-        _selectedFile = result.files.first;
-      });
+      _selectedFile = result.files.first;
+      setState(() {});
     } else {
       if (!mounted) return;
 

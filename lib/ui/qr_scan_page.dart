@@ -50,7 +50,7 @@ class _QRScanPageState extends State<QRScanPage> {
         context: context,
         builder: (context) => AlertDialog(
           title: const Text("Berhasil"),
-          content: const Text("Kontak berhasil ditambahkan."),
+          content: const Text("Contact added successfull."),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -60,11 +60,11 @@ class _QRScanPageState extends State<QRScanPage> {
         ),
       );
     } catch (e) {
-      debugPrint('Gagal decode atau simpan kontak: $e');
-      setState(() {
-        qrText = scanData;
-      });
+      debugPrint('Failed to save contact: $e');
+      qrText = scanData;
+
       _isProcessing = false;
+      setState(() {});
     }
   }
 

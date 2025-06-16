@@ -17,12 +17,6 @@ class ContactDetailPage extends StatefulWidget {
 class _ContactDetailPageState extends State<ContactDetailPage> {
   late Contact _contact;
 
-  @override
-  void initState() {
-    super.initState();
-    _contact = widget.contact;
-  }
-
   Future<void> _editContact() async {
     final updated = await Navigator.push(
       context,
@@ -32,7 +26,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     );
 
     // fetch ulang data agar terupdate
-    if (updated == true) {
+    if (updated) {
       await ContactRepository.getData();
 
       final latest = ContactRepository.contacts
@@ -57,6 +51,12 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
         builder: (_) => QRGeneratorPage(dataToEncode: dataJson),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _contact = widget.contact;
   }
 
   @override

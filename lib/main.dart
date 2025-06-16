@@ -63,8 +63,8 @@ class _MainPageState extends State<MainPage> {
   final GlobalKey<MyHomePageState> _homePageKey = GlobalKey();
 
   void loadDataContact() async {
-  await _homePageKey.currentState?.loadContacts();
-}
+    await _homePageKey.currentState?.loadContacts();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +73,7 @@ class _MainPageState extends State<MainPage> {
       child: Scaffold(
         body: TabBarView(
           children: [
-             MyHomePage(key: _homePageKey, title: 'My Contacts'),
+            MyHomePage(key: _homePageKey, title: 'My Contacts'),
             const Center(child: Text('Message page placeholder')),
             const Center(child: Text('Images page placeholder')),
             MySettingPage(
@@ -82,7 +82,6 @@ class _MainPageState extends State<MainPage> {
             ),
           ],
         ),
-
         bottomNavigationBar: BottomAppBar(
           shape: const CircularNotchedRectangle(),
           notchMargin: 8,
@@ -100,7 +99,6 @@ class _MainPageState extends State<MainPage> {
             indicatorColor: Colors.white,
           ),
         ),
-
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.blue,

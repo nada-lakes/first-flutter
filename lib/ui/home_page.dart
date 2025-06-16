@@ -21,62 +21,58 @@ class MyHomePage extends StatefulWidget {
 }
 
 class MyHomePageState extends State<MyHomePage> {
-  List<Contact> contacts = [];
-  List<Contact> filteredContacts = [];
-  static bool _showOnlyFavorites = false;
-  static bool _isAsc = true;
   final TextEditingController _searchController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    loadContacts();
-    _searchController.addListener(_filterContacts);
-  }
+  List<Contact> contacts = [];
+  List<Contact> filteredContacts = [];
+
+  static bool _showOnlyFavorites = false;
+  static bool _isAsc = true;
+
+  //CUSTOM INIT
 
   Future<void> loadContacts() async {
-    if (!mounted) return;
-
-    setState(() {
-      contacts = ContactRepository.contacts;
-      filteredContacts = contacts;
-    });
+    contacts = ContactRepository.contacts;
+    filteredContacts = contacts;
+    if (mounted) setState(() {});
   }
 
   void _filterContacts() {
     final query = _searchController.text.toLowerCase();
-    setState(() {
-      filteredContacts = contacts.where((contact) { 
-        return contact.name.toLowerCase().contains(query) || contact.phoneNumber.contains(query);
-      }).toList();
-    });
+    filteredContacts = contacts.where((contact) {
+      return contact.name.toLowerCase().contains(query) ||
+          contact.phoneNumber.contains(query);
+    }).toList();
+
+    setState(() {});
   }
 
   void _toggleSort() {
-    final sortedData = [...contacts];
+    final sortedData = contacts;
     sortedData.sort((a, b) {
       final nameA = a.name.toLowerCase();
       final nameB = b.name.toLowerCase();
       return _isAsc ? nameA.compareTo(nameB) : nameB.compareTo(nameA);
     });
 
-    setState(() {
-      filteredContacts = sortedData;
-      _isAsc = !_isAsc;
-    });
+    filteredContacts = sortedData;
+    _isAsc = !_isAsc;
+
+    setState(() {});
   }
 
   void _showFavoriteContacts() {
     final query = _searchController.text.toLowerCase();
     _showOnlyFavorites = !_showOnlyFavorites;
 
-    setState(() {
-      filteredContacts = contacts.where((contact) {
-        final matchesFavorite = !_showOnlyFavorites || contact.isFavorite;
-        final matchesQuery = contact.name.toLowerCase().contains(query) || contact.phoneNumber.contains(query);
-        return matchesFavorite && matchesQuery;
-      }).toList();
-    });
+    filteredContacts = contacts.where((contact) {
+      final matchesFavorite = !_showOnlyFavorites || contact.isFavorite;
+      final matchesQuery = contact.name.toLowerCase().contains(query) ||
+          contact.phoneNumber.contains(query);
+      return matchesFavorite && matchesQuery;
+    }).toList();
+
+    setState(() {});
   }
 
   void _onDelete(int id) async {
@@ -86,7 +82,7 @@ class MyHomePageState extends State<MyHomePage> {
 
   void _updateFavoriteContact(int id, bool isFavorite) async {
     final newStatus = !isFavorite;
-    await ContactRepository.updateFavoriteContact(id,newStatus);
+    await ContactRepository.updateFavoriteContact(id, newStatus);
     loadContacts();
   }
 
@@ -111,9 +107,9 @@ class MyHomePageState extends State<MyHomePage> {
         builder: (context) => const ImportPage(),
       ),
     ).then((shouldReload) {
-      if (shouldReload == true) {
+      if (shouldReload) {
         loadContacts();
-        _showMessage("Import Kontak", "Contact import successfull");
+        _showMessage("Import Contact", "Contact import successfull");
       }
     });
   }
@@ -149,7 +145,8 @@ class MyHomePageState extends State<MyHomePage> {
       if (!granted) {
         if (!mounted) return;
         Navigator.of(context).pop();
-        _showMessage("Export Contact", "Storage access was denied. Please enable storage permission in your device settings.");
+        _showMessage("Export Contact",
+            "Storage access was denied. Please enable storage permission in your device settings.");
         return;
       }
 
@@ -157,7 +154,7 @@ class MyHomePageState extends State<MyHomePage> {
 
       final excel = Excel.createExcel();
       final sheet = excel['Contacts'];
-      
+
       sheet.appendRow(['Name', 'Phone Number', 'Favorite']);
 
       for (var contact in contacts) {
@@ -188,10 +185,11 @@ class MyHomePageState extends State<MyHomePage> {
       if (!await directory.exists()) {
         await directory.create(recursive: true);
       }
-      
+
       // Simpan file
       final now = DateTime.now();
-      final formattedDate = '${now.year}-${_twoDigits(now.month)}-${_twoDigits(now.day)}_${_twoDigits(now.hour)}-${_twoDigits(now.minute)}-${_twoDigits(now.second)}';
+      final formattedDate =
+          '${now.year}-${_twoDigits(now.month)}-${_twoDigits(now.day)}_${_twoDigits(now.hour)}-${_twoDigits(now.minute)}-${_twoDigits(now.second)}';
       final filePath = '${directory.path}/contacts_export_$formattedDate.xlsx';
       final file = File(filePath);
       await file.writeAsBytes(bytes, flush: true);
@@ -223,14 +221,28 @@ class MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    loadContacts();
+
+    _searchController.addListener(_filterContacts);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).brightness == Brightness.dark
-          ? Theme.of(context).colorScheme.surface
-          : Theme.of(context).colorScheme.primary,
-          title: Text(
-        widget.title,
+            ? Theme.of(context).colorScheme.surface
+            : Theme.of(context).colorScheme.primary,
+        title: Text(
+          widget.title,
           style: const TextStyle(color: Colors.white),
         ),
       ),
@@ -244,95 +256,101 @@ class MyHomePageState extends State<MyHomePage> {
                   child: TextField(
                     controller: _searchController,
                     decoration: const InputDecoration(
-                      labelText: 'search',
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder()
-                    ),
+                        labelText: 'search',
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder()),
                   ),
                 ),
                 const SizedBox(width: 8),
                 IconButton(
                   icon: const Icon(Icons.sort_by_alpha),
                   tooltip: 'Sort Data',
-                  onPressed: _toggleSort, 
+                  onPressed: _toggleSort,
                 ),
                 IconButton(
-                  icon: Icon(_showOnlyFavorites ? Icons.favorite : Icons.favorite_border),
+                  icon: Icon(_showOnlyFavorites
+                      ? Icons.favorite
+                      : Icons.favorite_border),
                   color: _showOnlyFavorites ? Colors.blue : Colors.blue,
                   tooltip: 'Favorite',
-                  onPressed: _showFavoriteContacts, 
+                  onPressed: _showFavoriteContacts,
                 ),
                 IconButton(
                   icon: const Icon(Icons.refresh),
-                  onPressed: loadContacts, 
+                  onPressed: loadContacts,
                 ),
               ],
             ),
           ),
-
           Expanded(
             child: filteredContacts.isEmpty
-              ? const Center(
-                  child: Text(
-                    'Empty Data',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
-                  ),
-                )
-              : ListView.separated(
-              itemCount: filteredContacts.length,
-              itemBuilder: (context, index) {
-                final contact = filteredContacts[index];
+                ? const Center(
+                    child: Text(
+                      'Empty Data',
+                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                    ),
+                  )
+                : ListView.separated(
+                    itemCount: filteredContacts.length,
+                    itemBuilder: (context, index) {
+                      final contact = filteredContacts[index];
 
-                return Dismissible(
-                  key: Key(contact.id.toString()),
-                  direction: DismissDirection.endToStart,
-                  background: Container(
-                    color: Colors.red,
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: const Icon(Icons.delete, color: Colors.white),
-                  ),
-                  confirmDismiss: (direction) async {
-                    return await showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("Confirm Delete"),
-                        content: Text("Are you sure you want to delete ${contact.name}?"),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            child: const Text("Cancel"),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(true),
-                            child: const Text("Delete", style: TextStyle(color: Colors.red)),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  onDismissed: (direction) => _onDelete(contact.id),
-                  child: ContactListItem(
-                    contact: contact,
-                    updateFavoriteContact: _updateFavoriteContact,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ContactDetailPage(contact: contact),
+                      return Dismissible(
+                        key: Key(contact.id.toString()),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          color: Colors.red,
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: const Icon(Icons.delete, color: Colors.white),
                         ),
-                      ).then((shouldReload) {
-                          if (shouldReload == true) {
-                            loadContacts();
-                            _showMessage("Success", "Contact updated sucessfull.");
-                          }
-                      });
+                        confirmDismiss: (direction) async {
+                          return await showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text("Confirm Delete"),
+                              content: Text(
+                                  "Are you sure you want to delete ${contact.name}?"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
+                                  child: const Text("Cancel"),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
+                                  child: const Text("Delete",
+                                      style: TextStyle(color: Colors.red)),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        onDismissed: (direction) => _onDelete(contact.id),
+                        child: ContactListItem(
+                          contact: contact,
+                          updateFavoriteContact: _updateFavoriteContact,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ContactDetailPage(contact: contact),
+                              ),
+                            ).then((shouldReload) {
+                              if (shouldReload == true) {
+                                loadContacts();
+                                _showMessage(
+                                    "Success", "Contact updated sucessfull.");
+                              }
+                            });
+                          },
+                        ),
+                      );
                     },
+                    separatorBuilder: (context, index) => const Divider(),
                   ),
-                );
-              },
-              separatorBuilder: (context, index) => const Divider(),
-            ),
           ),
         ],
       ),
@@ -340,11 +358,11 @@ class MyHomePageState extends State<MyHomePage> {
         icon: Icons.add,
         activeIcon: Icons.close,
         backgroundColor: Theme.of(context).brightness == Brightness.dark
-          ? Colors.white
-          : Colors.blue,
+            ? Colors.white
+            : Colors.blue,
         foregroundColor: Theme.of(context).brightness == Brightness.dark
-          ? Colors.blue
-          : Colors.white,
+            ? Colors.blue
+            : Colors.white,
         children: [
           SpeedDialChild(
             child: const Icon(Icons.person_add),
@@ -352,10 +370,9 @@ class MyHomePageState extends State<MyHomePage> {
             onTap: () => navigateToAddContactPage(context),
           ),
           SpeedDialChild(
-            child: const Icon(Icons.input),
-            label: 'Import Contact',
-            onTap: () => navigateToImportPage(context)
-          ),
+              child: const Icon(Icons.input),
+              label: 'Import Contact',
+              onTap: () => navigateToImportPage(context)),
           SpeedDialChild(
             child: const Icon(Icons.file_download),
             label: 'Export Contact',
@@ -376,11 +393,4 @@ class MyHomePageState extends State<MyHomePage> {
   /// Di sini, kita memanggil `dispose()` pada `_searchController`
   /// untuk menghindari memory leak dan memastikan listener yang
   /// terkait juga dibersihkan dengan benar.
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
 }

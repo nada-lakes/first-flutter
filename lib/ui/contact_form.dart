@@ -30,27 +30,11 @@ class _ContactFormState extends State<ContactForm> {
       final imageBytes = await pickedFile.readAsBytes();
 
       if (!mounted) return;
+      _pickedXFile = pickedFile;
+      _selectedImage = imageBytes;
+      _base64Image = base64Encode(imageBytes);
 
-      setState(() {
-        _pickedXFile = pickedFile;
-        _selectedImage = imageBytes;
-        _base64Image = base64Encode(imageBytes);
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    Contact? contact = widget.contact;
-    if (contact != null) {
-      _nameController.text = contact.name;
-      _phoneController.text = contact.phoneNumber;
-      if (contact.photo != null) {
-        final decodedBytes = base64Decode(contact.photo.toString());
-        _selectedImage = decodedBytes;
-        _base64Image = widget.contact?.photo;
-      }
+      setState(() {});
     }
   }
 
@@ -102,6 +86,21 @@ class _ContactFormState extends State<ContactForm> {
 
     Navigator.pop(context);
     Navigator.pop(context, true);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Contact? contact = widget.contact;
+    if (contact != null) {
+      _nameController.text = contact.name;
+      _phoneController.text = contact.phoneNumber;
+      if (contact.photo != null) {
+        final decodedBytes = base64Decode(contact.photo.toString());
+        _selectedImage = decodedBytes;
+        _base64Image = widget.contact?.photo;
+      }
+    }
   }
 
   @override

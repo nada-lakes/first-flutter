@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/contact.dart';
 
@@ -29,7 +30,7 @@ class ContactRepository {
       final List<dynamic> decoded = jsonDecode(jsonString);
       _contacts = decoded.map((contact) => Contact.fromJson(contact)).toList();
     } catch (e) {
-      print("Failed to decode contacts JSON: $e");
+      debugPrint("Failed to decode contacts JSON: $e");
       _contacts = [];
     }
   }
